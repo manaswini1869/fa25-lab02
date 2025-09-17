@@ -37,14 +37,21 @@ import androidx.compose.ui.unit.dp
 import com.cs407.cardfolio.ui.theme.AppTheme
 import com.cs407.cardfolio.ui.theme.CardfolioTheme
 
+// Main entry point of the app
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Enables drawing behind system bars for immersive UI
         enableEdgeToEdge()
+
+        // Sets the UI content using Jetpack Compose
         setContent {
             CardfolioTheme {
                 val gradientTopColor = AppTheme.customColors.gradientTop
                 val gradientBottomColor = AppTheme.customColors.gradientBottom
+
+                // Root surface with gradient background
                 Surface(
                     modifier = Modifier
                         .fillMaxSize()
@@ -62,11 +69,14 @@ class MainActivity : ComponentActivity() {
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.fillMaxSize()
                     ) {
+                        // App title
                         Text(
                             text = stringResource(id = R.string.app_title),
                             style = MaterialTheme.typography.headlineLarge,
                             modifier = Modifier.padding(top = 16.dp, bottom = 24.dp)
                         )
+
+                        // Main card UI
                         Cardfolio()
                     }
                 }
@@ -77,14 +87,21 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun Cardfolio() {
+    // State variables for user inputs
     var name by remember { mutableStateOf("") }
     var hobby by remember { mutableStateOf("") }
     var age by remember { mutableStateOf("") }
+
+    // Tracks edit mode (true = editable, false = locked)
     var isEditing by remember { mutableStateOf(true) }
+
+    // Controls visibility of the hint banner
     var showHintBanner by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
     val outlineColor = MaterialTheme.colorScheme.outline
+
+    // Custom text field colors for read-only state
     val readOnlyTextFieldColors = OutlinedTextFieldDefaults.colors(
         disabledTextColor = MaterialTheme.colorScheme.onSurface,
         disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -92,6 +109,7 @@ fun Cardfolio() {
         disabledBorderColor = MaterialTheme.colorScheme.outline,
     )
 
+    // Auto-hide banner after 3 seconds when shown
     if (showHintBanner) {
         LaunchedEffect(Unit) {
             kotlinx.coroutines.delay(3000)
@@ -99,12 +117,14 @@ fun Cardfolio() {
         }
     }
 
+    // Show hint banner when editing is finished with valid data
     LaunchedEffect(isEditing) {
         if (!isEditing && (name.isNotBlank() && hobby.isNotBlank() && age.isNotBlank())) {
             showHintBanner = true
         }
     }
 
+    // Main card container
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
@@ -121,12 +141,14 @@ fun Cardfolio() {
                 containerColor = MaterialTheme.colorScheme.surface
             )
         ) {
+            // Card header: profile image + name + hobby + edit/lock chip
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 20.dp, vertical = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                // Profile image with circular border
                 Image(
                     painter = painterResource(id = R.drawable.download),
                     contentDescription = "Profile Image",
@@ -136,6 +158,8 @@ fun Cardfolio() {
                         .border(1.dp, outlineColor, CircleShape)
                 )
                 Spacer(Modifier.width(16.dp))
+
+                // Displays name & hobby or fallback text
                 Column(Modifier.weight(1f)) {
                     Text(
                         text = if (name.isBlank()) stringResource(id = R.string.card_name) else name,
@@ -147,12 +171,15 @@ fun Cardfolio() {
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
+
+                // Toggle between Edit and Lock states
                 AssistChip(
                     onClick = {
                         isEditing = !isEditing
                     },
                     label = {
-                        val statusTextResId = if (isEditing) R.string.editing_status else R.string.locked_status
+                        val statusTextResId =
+                            if (isEditing) R.string.editing_status else R.string.locked_status
                         Text(stringResource(id = statusTextResId))
                     },
                     leadingIcon = {
@@ -165,13 +192,17 @@ fun Cardfolio() {
                 )
             }
 
+            // Divider between header and fields
             HorizontalDivider(color = outlineColor)
+
+            // Input fields and actions
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 20.dp, vertical = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
+                // Name input
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
@@ -182,6 +213,7 @@ fun Cardfolio() {
                     colors = readOnlyTextFieldColors
                 )
 
+                // Hobby input
                 OutlinedTextField(
                     value = hobby,
                     onValueChange = { hobby = it },
@@ -192,9 +224,12 @@ fun Cardfolio() {
                     colors = readOnlyTextFieldColors
                 )
 
+                // Age input (only allows digits)
                 OutlinedTextField(
                     value = age,
-                    onValueChange = { input -> if (input.all { it.isDigit() }) { age = input } },
+                    onValueChange = { input ->
+                        if (input.all { it.isDigit() }) { age = input }
+                    },
                     label = { Text(stringResource(id = R.string.card_age_label)) },
                     readOnly = !isEditing,
                     leadingIcon = { Icon(Icons.Default.Info, contentDescription = null) },
@@ -205,22 +240,26 @@ fun Cardfolio() {
                 )
 
                 Spacer(Modifier.height(4.dp))
+
+                // Action buttons (Edit and Save)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    // Re-enable editing when locked
                     OutlinedButton(
-                        onClick = {
-                            isEditing = true
-                        },
+                        onClick = { isEditing = true },
                         enabled = !isEditing
                     ) {
                         Icon(Icons.Default.Edit, contentDescription = null)
                         Spacer(Modifier.width(8.dp))
                         Text(stringResource(id = R.string.button_edit))
                     }
+
                     Spacer(Modifier.width(8.dp))
+
+                    // Save button with validation
                     Button(
                         onClick = {
                             val missing = buildList {
@@ -230,12 +269,14 @@ fun Cardfolio() {
                             }
 
                             if (missing.isNotEmpty()) {
+                                // Warn user about missing fields
                                 Toast.makeText(
                                     context,
                                     "Please enter: ${missing.joinToString(", ")}",
                                     Toast.LENGTH_SHORT
                                 ).show()
                             } else {
+                                // Save success → lock form
                                 isEditing = false
                                 Toast.makeText(
                                     context,
@@ -251,34 +292,12 @@ fun Cardfolio() {
                         Text(stringResource(id = R.string.button_show))
                     }
                 }
-
-                AnimatedVisibility(visible = showHintBanner) {
-                    Surface(
-                        color = MaterialTheme.colorScheme.primaryContainer,
-                        shape = MaterialTheme.shapes.medium,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 16.dp)
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.padding(12.dp)
-                        ) {
-                            Icon(Icons.Default.Info, contentDescription = null)
-                            Spacer(Modifier.width(8.dp))
-                            Text(
-                                text = stringResource(id = R.string.hint_text),
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                        }
-                    }
-                }
             }
         }
     }
 }
 
-
+// Preview for Compose UI in Android Studio
 @Preview(showBackground = true)
 @Composable
 fun CardfolioPreview() {

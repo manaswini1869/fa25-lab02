@@ -11,6 +11,5 @@
     <string name="age_warning">Numbers only</string>
     <string name="button_edit">Edit</string>
     <string name="button_show">Show</string>
-    <string name="hint_text">Saved. Tap “Edit” to update your info.</string>
 
 </resources>
