@@ -289,7 +289,7 @@ fun Cardfolio() {
                     ) {
                         Icon(Icons.Default.Check, contentDescription = null)
                         Spacer(Modifier.width(8.dp))
-                        Text(stringResource(id = R.string.button_show))
+                        Text(stringResource(id = R.string.button_save))
                     }
                 }
             }

@@ -10,6 +10,6 @@
     <string name="card_age_label">Age</string>
     <string name="age_warning">Numbers only</string>
     <string name="button_edit">Edit</string>
-    <string name="button_show">Show</string>
+    <string name="button_save">Save</string>
 
 </resources>
